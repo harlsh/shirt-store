@@ -29,6 +29,7 @@ export const actions = {
         }
         
 
+        const response = await fetch('http://localhost:8080', {})
         // if present return an error
 
         // else create a new record
