@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -12,17 +13,17 @@ func AuthRequired(c *gin.Context) {
 	session := sessions.Default(c)
 	user := session.Get(userkey)
 	if user == nil {
-		// Abort the request with the appropriate error code
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
-	// Continue down the chain to handler etc
 	c.Next()
 }
 
 func LoginHandle(c *gin.Context) {
 
 	session := sessions.Default(c)
+	token, _ := c.Cookie("shirt-store-session")
+	fmt.Println("Cookie is ", token)
 
 	type Login struct {
 		Email    string
@@ -55,15 +56,20 @@ func LoginHandle(c *gin.Context) {
 		return
 	}
 
-	//save the login session somehow
-	session.Set(userkey, dbUser)
+	session.Set(userkey, dbUser.ID)
 
 	if err := session.Save(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, dbUser)
+	type AuthKeyUser struct {
+		User
+		AuthKey string
+	}
+
+	userWithAuthKey := AuthKeyUser{ dbUser, token}
+	c.JSON(http.StatusOK, userWithAuthKey)
 
 }
 

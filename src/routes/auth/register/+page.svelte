@@ -1,6 +1,6 @@
 <script>
     import { enhance } from '$app/forms';
-    import { fly, slide } from 'svelte/transition';
+    import { fly } from 'svelte/transition';
 	import Spinner from 'svelte-spinner';
 
 	export let form;
@@ -12,7 +12,6 @@
 method="POST"
 	action="?/register"
 	data-sveltekit-keepfocus
-    out:slide
 	use:enhance={() => {
 		loading = true;
 
@@ -47,15 +46,12 @@ method="POST"
 
 <style>
 	form {
-		width: 100%;
-		height: 100%;
+		width: 40%;
+		height: 80%;
 		display: flex;
 		flex-direction: column;
 		text-align: right;
 		margin-right: 0;
-		align-items: center;
-		/* justify-content: center; */
-		gap: 1rem;
-		flex: 1;
+		/* align-items: center; */
 	}
 </style>

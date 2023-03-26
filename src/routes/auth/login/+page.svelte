@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fly, slide } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 	import { enhance } from '$app/forms';
 	import Spinner from 'svelte-spinner';
 
@@ -12,7 +12,6 @@
 	method="POST"
 	action="?/login"
 	data-sveltekit-keepfocus
-	out:slide
 	use:enhance={() => {
 		loading = true;
 
@@ -34,7 +33,7 @@
 		Password
 		<input name="password" type="password" minlength="8" />
 	</label>
-	<div class="btn">
+	<!-- <div class="btn"> -->
 		<button disabled={loading}>
 			{#if loading}
 				<Spinner />
@@ -42,25 +41,26 @@
 				Log in
 			{/if}
 		</button>
-		<button>
-			<a href="/auth/register"> Register </a>
-		</button>
-	</div>
+		<a href="/auth/register"> Register? </a>
+		
+	<!-- </div> -->
 </form>
 
 <style>
 	form {
-		width: 100%;
-		height: 100%;
+		width: 35%;
+		height: 50%;
 		display: flex;
 		flex-direction: column;
 		text-align: right;
-		margin-right: 0;
-		align-items: center;
+		/* margin-right: 0; */
+		/* align-items: center; */
 		/* justify-content: center; */
-		gap: 1rem;
-		flex: 1;
+		/* gap: 1rem; */
+		/* flex: 1; */
+		
 	}
+
 
 	/* input {
 		float: right;

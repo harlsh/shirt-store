@@ -9,8 +9,6 @@ export const actions = {
 		const password = data.get('password');
         const passwordConfirm = data.get('password-confirmation');
 
-        console.log(data);
-		await new Promise((fulfil) => setTimeout(fulfil, 1000));
 
 
 		if (!email) return fail(400, { email, message: 'You forgot to enter your email.' });
@@ -29,14 +27,19 @@ export const actions = {
         }
         
 
-        const response = await fetch('http://localhost:8080', {})
-        // if present return an error
+        const response = await fetch('http://localhost:8080/register', {
+            method: "POST",
+            headers:{
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(user)
+        });
+        
+        const responseJson = await response.json();
 
-        // else create a new record
+        if(response.status != 200) return fail(400, {email, message: responseJson.error})
+        
 
-        // redirect to login page
-
-
-		throw redirect(303, '/');
+		throw redirect(303, '/auth/login');
 	}
 };
