@@ -1,57 +1,59 @@
 package main
 
 import (
-	"net/http"
+	"log"
+	"os"
+	"shirt-store/handlers"
+	"shirt-store/middleware"
+	"shirt-store/models"
 
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/sqlite"
+	"github.com/joho/godotenv"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
-
-
 
 var db *gorm.DB
 
 const secret = "shirtsarecool"
 const userkey = "user"
 
-
 func main() {
 
-	var err error
-	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
-
-	if err != nil {
-		panic("failed to connect database")
+	if err := godotenv.Load(); err != nil {
+		log.Println("Error loading .env file")
 	}
-	db.AutoMigrate(&User{})
+	port := os.Getenv("PORT")
 
-	r := gin.Default()
+	r := SetupRouter()
 
-	r.Use(sessions.Sessions("shirt-store-session", cookie.NewStore([]byte(secret))))
-
-	r.POST("/register", RegisterHandle)
-	r.POST("/login", LoginHandle)
-	r.GET("/logout", LogoutHandle)
-	r.GET("/users", UsersHandle)
-
-	private := r.Group("/private")
-	private.Use(AuthRequired)
-	{
-		private.GET("/me", me)
-		private.GET("/status", status)
-	}
-
-	r.Run() 
+	log.Fatal(r.Run("localhost:" + port))
 }
 
-func UsersHandle(c *gin.Context) {
-	var users []User
-	db.Find(&users)
-	c.JSON(http.StatusOK, users)
+func DbInit() *gorm.DB {
+	db, err := models.Setup()
+	if err != nil {
+		log.Println("Problem setting up database")
+	}
+	return db
+}
+
+func SetupRouter() *gin.Engine {
+	r := gin.Default()
+
+	db := DbInit()
+
+	server := handlers.NewServer(db)
+
+	router := r.Group("/api")
+
+	router.POST("/register", server.Register)
+	router.POST("/login", server.Login)
+	router.GET("/me", server.Me)
+	authorized := r.Group("/api/admin")
+
+	authorized.Use(middleware.JwtAuthMiddleware())
+	// authorized.GET("/groceries", server.GetGroceries)
+	// authorized.POST("/grocery", server.PostGrocery)
+	return r
+
 }

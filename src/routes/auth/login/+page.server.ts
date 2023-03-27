@@ -6,7 +6,6 @@ export const actions = {
 		const email = data.get('email');
 		const password = data.get('password');
 
-		await new Promise((fulfil) => setTimeout(fulfil, 1000));
 
 		if (!email) return fail(400, { email, message: 'You forgot to enter your email.' });
 
@@ -19,15 +18,12 @@ export const actions = {
             },
             body: JSON.stringify({ email, password})
         });
-        
-		console.log("response is : ", response)
-        const responseJson = await response.json();
 
-        if(response.status != 200) return fail(400, {email, message: responseJson.error})
-        
-		console.log(responseJson)
-		console.log("cookies are : ", response.headers.get("cookies"))
-		cookies.set('session', responseJson.authKey, { path: '/', httpOnly:true, sameSite: 'strict', maxAge: 60 * 60 * 24 * 30})
+        const user = await response.json();
+
+        if(response.status != 200) return fail(400, {email, message: user.error})
+
+		cookies.set('session', user.AuthKey, { path: '/', httpOnly:true, sameSite: 'strict', maxAge: 60 * 60 * 24 * 30})
 
 		// throw redirect(303, '/');
 	}
