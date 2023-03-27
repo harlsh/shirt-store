@@ -68,9 +68,11 @@ func CurrentUser(c *gin.Context) (models.User, error) {
 }
 
 func GetToken(c *gin.Context) (*jwt.Token, error) {
-	tokenString, _ := c.Cookie("jwt")
-	fmt.Println("token from cookie: ", tokenString)
-	fmt.Println("private key is ", privateKey)
+	tokenString, err := c.Cookie("jwt")
+
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Did not receive the JWT token from the cookies"})
+	}
 
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

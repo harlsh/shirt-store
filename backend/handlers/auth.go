@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"shirt-store/models"
 	"shirt-store/utils"
@@ -28,6 +27,12 @@ type Server struct {
 
 func NewServer(db *gorm.DB) *Server {
 	return &Server{db}
+}
+
+func (server *Server) GetGroceries(c *gin.Context) {
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "welcome to the underworld!"})
 }
 
 func (server *Server) Login(c *gin.Context) {
@@ -76,8 +81,6 @@ func (server *Server) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, userWithAuthKey)
 
 }
-
-
 
 func (server *Server) Register(c *gin.Context) {
 
@@ -128,10 +131,9 @@ func (server *Server) Register(c *gin.Context) {
 }
 
 func (server *Server) Me(c *gin.Context) {
-	fmt.Println("Hello")
 	user, err := utils.CurrentUser(c)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Could not read/find the JWT token in the request"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"user": user})

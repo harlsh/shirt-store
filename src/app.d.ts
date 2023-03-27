@@ -8,7 +8,6 @@ declare global {
 				Email: string
 				FirstName: string
 				LastName: string
-				AuthKey: string
 			}
 		}
 		// interface PageData {}

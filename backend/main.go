@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"os"
+	// "os"
 	"shirt-store/handlers"
 	"shirt-store/middleware"
 	"shirt-store/models"
@@ -22,11 +22,11 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("Error loading .env file")
 	}
-	port := os.Getenv("PORT")
+	// port := os.Getenv("PORT")
 
 	r := SetupRouter()
 
-	log.Fatal(r.Run("localhost:" + port))
+	log.Fatal(r.Run())
 }
 
 func DbInit() *gorm.DB {
@@ -49,11 +49,10 @@ func SetupRouter() *gin.Engine {
 	router.POST("/register", server.Register)
 	router.POST("/login", server.Login)
 	router.GET("/me", server.Me)
-	authorized := r.Group("/api/admin")
+	authorized := r.Group("/api/")
 
 	authorized.Use(middleware.JwtAuthMiddleware())
-	// authorized.GET("/groceries", server.GetGroceries)
-	// authorized.POST("/grocery", server.PostGrocery)
+	authorized.GET("/groceries", server.GetGroceries)
 	return r
 
 }
